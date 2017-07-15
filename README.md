@@ -14,8 +14,8 @@ App Store Reviews as a Service
 3. Activate `appuity`
 4. git clone this repo
 5. cd into source
-6. pip install -r requirements.txt
-7. cp config.sample.py config.py
+6. $ pip install -r requirements.txt
+7. $ cp config.sample.py config.py
 8. Make changes to orator db connection in config.py
-9. Run the migrations
-10. invoke dev
+9. $ orator migrate -c config.py
+10. $ invoke dev
