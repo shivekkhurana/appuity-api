@@ -5,7 +5,7 @@ class CreateAuthorsTable(Migration):
         with self.schema.create('authors') as table:
             table.increments('id')
             table.string('name')
-            table.long_text('avatar_url')
+            table.long_text('avatar_url').unique()
             table.timestamps()
 
     def down(self):
