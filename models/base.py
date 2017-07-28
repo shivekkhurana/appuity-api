@@ -5,4 +5,4 @@ db = DatabaseManager(databases)
 Model.set_connection_resolver(db)
 
 class Base(Model):
-	pass
+    pass

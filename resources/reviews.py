@@ -1,6 +1,6 @@
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 
-class Reviews(Resource):
-    def get(self, app_id):
-        return {'msg': 'Showing reviews for {}'.format(app_id)}
+class ReviewsResource(Resource):
+    def get(self, play_store_id):
+        return {'msg': 'Showing reviews for {}'.format(play_store_id)}
         

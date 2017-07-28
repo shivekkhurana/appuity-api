@@ -8,4 +8,3 @@ class Author(Base):
 	@has_many
 	def reviews(self):
 		return Review
-	
