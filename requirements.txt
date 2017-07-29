@@ -1,5 +1,6 @@
 aniso8601==1.2.1
 backpack==0.1
+beautifulsoup4==4.6.0
 blinker==1.4
 certifi==2017.4.17
 chardet==3.0.4

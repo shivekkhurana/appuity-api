@@ -14,4 +14,3 @@ class CreateReviewsTable(Migration):
 
     def down(self):
         self.schema.drop('reviews')
-
