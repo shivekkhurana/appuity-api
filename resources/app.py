@@ -34,27 +34,32 @@ class AppResource(Resource):
 
         soup = BeautifulSoup(play_store_html.text, 'html.parser')
 
-        #print(soup.prettify())
-        # meta_info = soup.select(".meta-info")[0]
-        # for info in meta_info:
-        #     print(info.next_sibling)
         meta_info = soup.select(".meta-info")
 
+        version = ''
+        if 'Current Version' in meta_info[2].text:
+            version += meta_info[2].text
+        else:
+            version += 'Not Mentioned'
+
+        
         return {
             'msg' : 'App found',
             'text': str(play_store_html),
+            'Cover-Image URL':str(soup.find('img', {"class": "cover-image"})['src']),
             'title':str(soup.select(".id-app-title")[0].text),
             'category':str(soup.select(".category")[0].text),
             'Total Reviews':str(soup.select(".reviews-num")[0].text),
             'Average Rating':str(soup.select(".score")[0].text),
             'Last Updated':str(meta_info[0].text),
             'Downloads':str(meta_info[1].text),
-            'Developer':str(meta_info[-2].text),
-            'Offered By':str(meta_info[-1].text),
-            'Current Version':'',
+            'Offered By':str(meta_info[-2].text),
+            'Developer':str(meta_info[-1].text),
+            'Current Version':version,
             'Size':'',
             'status': 200
-        }   
+        }
+
         # app.name = doc('div.id-app-title')[0].text().strip()
         # app.category = doc('a.document-subtitle.category')[0].text().strip()
         # app.total_reviews = doc('span.rating-count')[0].text().strip()
