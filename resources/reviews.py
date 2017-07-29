@@ -26,27 +26,25 @@ class ReviewsResource(Resource):
         soup = BeautifulSoup(play_store_html.text, 'html.parser')
 
         meta_info = soup.select(".meta-info")
-        review_authors = soup.select(".author-name")
-        review_text = soup.select(".review-body")
+
+        author_names = soup.select(".author-name")
+        review_texts = soup.select(".review-body")
         review_date = soup.select(".review-date")
-        #review_rating = soup.findAll('div',{"class": "tiny-star"})
+        review_rating = soup.findAll('div',{"class": "review-info-star-rating"})
 
-        review_s = '{'
-
-        for review,author,date in zip(review_text,review_authors,review_date):
-        	review_s+= 'User'+author.text + 'Writes on '+date.text+ '-- '+review.text+ ". "
-
-        review_s+='}'
+        # First 6 reviews are featured reviews, so they are repeated in the general reviews as well
+        # So, we have removed the first 6 reviews.
+        author_urls  = soup.findAll('span', {"class": "responsive-img-hdpi"})[6:]
         
-        #print('0th element : '+review_rating[0]['aria-label'])
+        review_s = '' 
 
-        # for rating in review_rating:
-        # 	print('rating is '+rating['aria-label'])
-
-
-
-        print('Number of Reviews is : ',len(review_text))
-
+        # Review objects can be created here
+        for i,review,author_name,author_url,date,rating in zip(range(1,len(author_names)),review_texts,author_names,author_urls,review_date,review_rating):
+            author_link = author_url.find('span')['style'][21:-1]
+            stars = rating.find('div')['aria-label'][6:7]
+            review_s+= str(i)+' User'+author_name.text + 'With URL '+ author_link + \
+            ' Writes on '+date.text+ '-- '+review.text+ "and gave " + stars + ' stars. '
+        
 
         return {
             'msg' : 'App found',
@@ -59,8 +57,7 @@ class ReviewsResource(Resource):
             'Developer':str(meta_info[-2].text),
             'Offered By':str(meta_info[-1].text),
             'All Reviews ':str(review_s),
-
-
+            
         }
 
         # We have one more info i.e -- 'date of the review', we can add it if we want. 
