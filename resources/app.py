@@ -34,27 +34,27 @@ class AppResource(Resource):
 
         soup = BeautifulSoup(play_store_html.text, 'html.parser')
 
-        meta_info = soup.select(".meta-info")
+        meta_info = soup.findAll('div',{"class": "meta-info"})
 
         version = ''
         if 'Current Version' in meta_info[2].text:
-            version += meta_info[2].text
+            version += meta_info[2].text.strip()[17:]
         else:
             version += 'Not Mentioned'
 
         
         return {
             'msg' : 'App found',
-            'text': str(play_store_html),
+            'Response': str(play_store_html),
             'Cover-Image URL':str(soup.find('img', {"class": "cover-image"})['src']),
             'title':str(soup.select(".id-app-title")[0].text),
-            'category':str(soup.select(".category")[0].text),
+            'category':str(soup.select(".category")[0].text.strip()),
             'Total Reviews':str(soup.select(".reviews-num")[0].text),
             'Average Rating':str(soup.select(".score")[0].text),
-            'Last Updated':str(meta_info[0].text),
-            'Downloads':str(meta_info[1].text),
-            'Offered By':str(meta_info[-2].text),
-            'Developer':str(meta_info[-1].text),
+            'Last Updated':str(meta_info[0].text.strip()[8:]),
+            'Downloads':str(meta_info[1].text.strip()[10:]),
+            'Offered By':str(meta_info[-2].text.strip()[11:]),
+            'Developer':str(meta_info[-1].text.strip()[11:]),
             'Current Version':version,
             'Size':'',
             'status': 200
