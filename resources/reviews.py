@@ -1,3 +1,7 @@
+from google.cloud import language
+from google.cloud.language import enums
+from google.cloud.language import types
+
 from flask_restful import Resource
 from bs4 import BeautifulSoup
 import requests
@@ -32,20 +36,43 @@ class ReviewsResource(Resource):
         review_date = soup.select(".review-date")
         review_rating = soup.findAll('div',{"class": "review-info-star-rating"})
 
-        # First 6 reviews are featured reviews, so they are repeated in the general reviews as well
+        # First 6 reviews are featured reviews, they are repeated in the general reviews as well
         # So, we have removed the first 6 reviews.
         author_urls  = soup.findAll('span', {"class": "responsive-img-hdpi"})[6:]
         
+        # Instantiates a client
+        client = language.LanguageServiceClient()
+
         review_s = '' 
 
         # Review objects can be created here
-        for i,review,author_name,author_url,date,rating in zip(range(1,len(author_names)),review_texts,author_names,author_urls,review_date,review_rating):
+        for i,review,author_name,author_url,date,rating in zip(range(1,len(author_names)),
+                 review_texts,
+                 author_names,
+                 author_urls,
+                 review_date,
+                 review_rating):
             author_link = author_url.find('span')['style'][21:-1]
             stars = rating.find('div')['aria-label'][6:7]
+            review_trim = review.text[:-15]
+            document = types.Document(content=review_trim,type=enums.Document.Type.PLAIN_TEXT)
+            sentiment = client.analyze_sentiment(document=document).document_sentiment
             review_s+= str(i)+' User'+author_name.text + 'With URL '+ author_link + \
-            ' Writes on '+date.text+ '-- '+review.text+ "and gave " + stars + ' stars. '
+            ' Writes on '+date.text+ '-- '+review_trim+ " and gave " + stars + ' stars.' + \
+            'Sentiment Score - ' +str(sentiment.score)+' Emotional Magnitude -- '+str(sentiment.magnitude)+' '
         
 
+        
+        # # The text to analyze
+        # text = u'Hello, world!'
+        # document = types.Document(content=text,type=enums.Document.Type.PLAIN_TEXT)
+
+        # # Detects the sentiment of the text
+        # sentiment = client.analyze_sentiment(document=document).document_sentiment
+
+        # print('Text given : {}'.format(text))
+        # print('Sentiment: {}, {}'.format(sentiment.score, sentiment.magnitude))
+        
         return {
             'msg' : 'App found',
             'App Title':str(soup.select(".id-app-title")[0].text),
