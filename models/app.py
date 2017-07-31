@@ -10,7 +10,6 @@ class App(Base):
 		'avg_rating',
 		'last_updated',
 		'current_version',
-		'size',
 		'no_of_downloads',
 		'offered_by',
 		'developer',
