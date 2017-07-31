@@ -40,8 +40,27 @@ class ReviewsResource(Resource):
         # So, we have removed the first 6 reviews.
         author_urls  = soup.findAll('span', {"class": "responsive-img-hdpi"})[6:]
         
+        # Creating a Credentials Object, this one is used when you are making a http request. So not suitable in this file.
+        # creds = service_account.Credentials.from_service_account_file('..\Appuity-23548e4bd5e5.json')
+
         # Instantiates a client
+        # client = language.LanguageServiceClient(credentials=creds)
+
+        # Approach 5 This file is directly under the Appuity folder. Can change it based on what is best position.
+        credential = language.Client.from_service_account_json('..\Appuity-23548e4bd5e5.json')
+
+        # Approach 2
         client = language.LanguageServiceClient()
+
+        # Approach 3
+        # client = language.Client.from_service_account_json('..\Appuity-23548e4bd5e5.json')
+
+        # Approach 4
+        # client = language.LanguageServiceClient(credentials=creds)
+
+        # Checking client object
+        # document = types.Document(content='Not authenticated !!',type=enums.Document.Type.PLAIN_TEXT)
+        # print('My client is -- '+str(client.analyze_sentiment(document=document).document_sentiment))
 
         review_s = '' 
 
@@ -61,17 +80,6 @@ class ReviewsResource(Resource):
             ' Writes on '+date.text+ '-- '+review_trim+ " and gave " + stars + ' stars.' + \
             'Sentiment Score - ' +str(sentiment.score)+' Emotional Magnitude -- '+str(sentiment.magnitude)+' '
         
-
-        
-        # # The text to analyze
-        # text = u'Hello, world!'
-        # document = types.Document(content=text,type=enums.Document.Type.PLAIN_TEXT)
-
-        # # Detects the sentiment of the text
-        # sentiment = client.analyze_sentiment(document=document).document_sentiment
-
-        # print('Text given : {}'.format(text))
-        # print('Sentiment: {}, {}'.format(sentiment.score, sentiment.magnitude))
         
         return {
             'msg' : 'App found',
@@ -81,8 +89,8 @@ class ReviewsResource(Resource):
             'Average Rating':str(soup.select(".score")[0].text),
             'Last Updated':str(meta_info[0].text),
             'Downloads':str(meta_info[1].text),
-            'Developer':str(meta_info[-2].text),
-            'Offered By':str(meta_info[-1].text),
+            'Developer':str(meta_info[-1].text),
+            'Offered By':str(meta_info[-2].text),
             'All Reviews ':str(review_s),
             
         }
