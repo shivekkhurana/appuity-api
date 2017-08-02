@@ -1,3 +1,4 @@
+from flask import jsonify
 from flask_restful import Resource, reqparse
 from bs4 import BeautifulSoup
 import requests
@@ -12,17 +13,12 @@ class AppsResource(Resource):
 
 # Instance resource
 class AppResource(Resource):
-    def res(self, app):
-        return {
-            'msg': 'App Data',
-            'data': str(app)
-        }
-
+    
     def get(self, play_store_id):
         # check if app already exists in personal database 
-        exists = App.where('play_store_id', '=', play_store_id).first()
-        if (exists):
-            return self.res(exists)
+        app_found = App.where('play_store_id', '=', play_store_id).first()
+        if (app_found):
+            return jsonify(app_found.serialize)
 
         # fetch html from play store
         play_store_html = requests.get('https://play.google.com/store/apps/details?id={}'.format(play_store_id))
@@ -42,41 +38,20 @@ class AppResource(Resource):
         else:
             version += 'Not Mentioned'
 
-        
-        return {
-            'msg' : 'App found',
-            'Response': str(play_store_html),
-            'Cover-Image URL':str(soup.find('img', {"class": "cover-image"})['src']),
-            'title':str(soup.select(".id-app-title")[0].text),
-            'category':str(soup.select(".category")[0].text.strip()),
-            'Total Reviews':str(soup.select(".reviews-num")[0].text),
-            'Average Rating':str(soup.select(".score")[0].text),
-            'Last Updated':str(meta_info[0].text.strip()[8:]),
-            'Downloads':str(meta_info[1].text.strip()[10:]),
-            'Offered By':str(meta_info[-2].text.strip()[11:]),
-            'Developer':str(meta_info[-1].text.strip()[11:]),
-            'Current Version':version,
-            'Size':'',
-            'status': 200
-        }
+        app = App()
+        app.name = str(soup.select(".id-app-title")[0].text)
+        app.category = str(soup.select(".category")[0].text.strip())
+        app.total_reviews = str(soup.select(".reviews-num")[0].text)
+        app.icon_url = str(soup.find('img', {"class": "cover-image"})['src'])
+        app.avg_rating = str(soup.select(".score")[0].text)
+        app.last_updated = str(meta_info[0].text.strip()[8:])
+        app.current_version = version
+        app.no_of_downloads = str(meta_info[1].text.strip()[10:])
+        app.offered_by = str(meta_info[-2].text.strip()[11:])
+        app.developer = str(meta_info[-1].text.strip()[11:])
+        app.play_store_id = play_store_id
 
-        # app.name = doc('div.id-app-title')[0].text().strip()
-        # app.category = doc('a.document-subtitle.category')[0].text().strip()
-        # app.total_reviews = doc('span.rating-count')[0].text().strip()
-        # app.avg_rating = doc('div.score')[0].text().strip()
-        # app.last_updated = doc('div[itemprop=datePublished]')[0].text().strip()
-        # app.current_version = doc('div[itemprop=softwareVersion]')[0].text().strip()
-        # app.size = doc('div[itemprop=datePublished]')[0].text().strip()
-        #app.no_of_downloads = doc('div[itemprop=numDownloads]')[0].text().strip()
-        # app.offered_by = doc('div[itemprop=datePublished]')[0].text().strip()
-        # dev_links = doc('a.dev-links')
-        # app.developer = {
-        #     doc('div[itemprop=datePublished]')[0].text().strip()
-        # }
-        # app.play_store_id = play_store_id
-        # print(app)
-
-        
+        return ({'app_details':app.serialize})
 
         # parse authors and save
         # parse reviews
