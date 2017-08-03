@@ -6,6 +6,7 @@ from google.cloud.proto.language.v1beta2 import language_service_pb2
 from flask_restful import Resource
 from bs4 import BeautifulSoup
 import requests
+import jsonpickle
 
 
 from models import App,Review
@@ -28,6 +29,14 @@ def return_entity(num):
     else:
         return 'OTHER'
 
+def mention_entity(self,num):
+    if(num==0):
+        return 'TYPE_UNKNOWN'
+    elif(num==1):
+        return 'PROPER'
+    else:
+        return 'COMMON'
+
 class ReviewsResource(Resource):
 
     def get(self, play_store_id):
@@ -48,24 +57,27 @@ class ReviewsResource(Resource):
                 'status': 404
             }
 
-        soup = BeautifulSoup(play_store_html.text, 'html.parser')
+        # soup = BeautifulSoup(play_store_html.text, 'html.parser')
 
-        # First 6 reviews are featured reviews, they are repeated in the general reviews as well
-        # So, we have removed the first 6 reviews.
-        author_urls  = soup.findAll('span', {"class": "responsive-img-hdpi"})[6:]
-        # if len(author_urls)<1:
-        #     return jsonify({'message':'Reviews less than 6'})
+        # review_details  = soup.findAll('div', {"class": "single-review"})
 
-        meta_info = soup.select(".meta-info")
+        # all_reviews = []
 
-        author_names = soup.select(".author-name")
-        review_texts = soup.select(".review-body")
-        review_date = soup.select(".review-date")
-        review_rating = soup.findAll('div',{"class": "review-info-star-rating"})
-       
-        # Creating a Credentials Object, this one is used when you are making a http request. So not suitable in this file.
-        # Approach 5 This file is directly under the Appuity folder. Can change it based on what is best position.
-        credential = language.Client.from_service_account_json('..\Appuity-23548e4bd5e5.json')
+        # for review_detail in review_details:
+        #     review = Review()
+        #     review.author_id = review_detail.find('span',{"class":"responsive-img-hdpi"}).find('span')['style'][21:-1]
+        #     review.review_text = review_detail.find('div',{"class":"review-body"}).text.strip()[:-13]
+        #     review.app_id = review_detail.find('span',{"class":"author-name"}).text.strip()
+        #     review.analysis = 1.0
+        #     review.date = review_detail.find('span',{"class":"review-date"}).text
+        #     review.rating = review_detail.find('div',{"class":"tiny-star star-rating-non-editable-container"})['aria-label'][6:7]
+        #     all_reviews.append(review)
+
+        # return [review.serialize for review in all_reviews]
+
+        # # Creating a Credentials Object, this one is used when you are making a http request. So not suitable in this file.
+        # # Approach 5 This file is directly under the Appuity folder. Can change it based on what is best position.
+        # credential = language.Client.from_service_account_json('..\Appuity-23548e4bd5e5.json')
 
         # Approach 2
         client = language_service_client.LanguageServiceClient()
@@ -114,7 +126,7 @@ class ReviewsResource(Resource):
             result_json['entities']['sentiment']['magnitude'] = entity.sentiment.magnitude
             all_entities.append(result_json)
 
-        all_reviews = [] 
+        return all_entities
 
         # Review objects can be created here
         # for i,review,author_name,author_url,date,rating in zip(range(1,len(author_names)),
@@ -125,21 +137,21 @@ class ReviewsResource(Resource):
         #          review_rating):
         #     author_link = author_url.find('span')['style'][21:-1]
         #     stars = rating.find('div')['aria-label'][6:7]
-        #     review_trim = review.text[2:-15]
+        #     review_trim = review.text.strip()[:-13]
+        #     name = author_name.text.strip()
         #     # document = types.Document(content=review_trim,type=enums.Document.Type.PLAIN_TEXT)
         #     # sentiment = client.analyze_sentiment(document=document).document_sentiment
 
         #     temp_review = Review()
         #     temp_review.app_id = play_store_id
-        #     temp_review.author_id = 1
+        #     temp_review.author_id = name
         #     temp_review.rating = stars
         #     temp_review.review_text = review_trim
         #     temp_review.date = date.text
-        #     temp_review.score = 0.0
-        #     temp_review.magnitude = 0.0
+        #     temp_review.analysis = 0.0
         #     all_reviews.append(temp_review)
         
 
         # analysis = jsonpickle.encode(str(result_json))
 
-        return all_entities
+        # return [review.serialize for review in all_reviews]

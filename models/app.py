@@ -6,7 +6,7 @@ class App(Base):
     __fillable__ = [
         'name',
         'category',
-        'total_reviews',
+        'total_ratings',
         'icon_url',
         'avg_rating',
         'last_updated',
@@ -26,7 +26,7 @@ class App(Base):
         return {
             'name':self.name,
             'category':self.category,
-            'total_reviews':self.total_reviews,
+            'total_ratings':self.total_ratings,
             'icon_url':self.icon_url,
             'average_rating':self.avg_rating,
             'last_updated':self.last_updated,
