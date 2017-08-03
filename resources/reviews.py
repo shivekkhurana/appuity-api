@@ -1,18 +1,32 @@
 from google.cloud import language
-# from google.cloud.language import enums
-# from google.cloud.language import types
-
 from google.cloud.gapic.language.v1beta2 import enums
 from google.cloud.gapic.language.v1beta2 import language_service_client
 from google.cloud.proto.language.v1beta2 import language_service_pb2
 
-from flask import jsonify
 from flask_restful import Resource
 from bs4 import BeautifulSoup
 import requests
-import jsonpickle
+
 
 from models import App,Review
+
+def return_entity(num):
+    if(num==0):
+        return 'UNKNOWN'
+    elif(num==1):
+        return 'PERSON'
+    elif(num==2):
+        return 'LOCATION'
+    elif(num==3):
+        return 'ORGANIZATION'
+    elif(num==4):
+        return 'EVENT'
+    elif(num==5):
+        return 'WORK_OF_ART'
+    elif(num==6):
+        return 'CONSUMER_GOOD'
+    else:
+        return 'OTHER'
 
 class ReviewsResource(Resource):
 
@@ -24,6 +38,7 @@ class ReviewsResource(Resource):
             	'msg':'Found in the database. No need to crawl',
             	'status':200
             }
+
 
         # fetch html from play store
         play_store_html = requests.get('https://play.google.com/store/apps/details?id={}'.format(play_store_id))
@@ -83,18 +98,18 @@ class ReviewsResource(Resource):
             result_json = {}
             result_json['entities'] = {}
             result_json['entities']['name'] = entity.name
-            result_json['entities']['type'] = enum.return_entity(entity.type)
+            result_json['entities']['type'] = entity.type
             result_json['entities']['salience'] = entity.salience 
             result_json['entities']['mention'] = {}
             result_json['entities']['mention']['text'] = {}
             result_json['entities']['mention']['sentiment'] = {}
             result_json['entities']['sentiment'] = {}
             for mention in entity.mentions:
-                result_json['entities']['mention']['text']['begin_Offset'] = mention.text.begin_offset
                 result_json['entities']['mention']['text']['Content'] = mention.text.content
+                result_json['entities']['mention']['text']['begin_Offset'] = mention.text.begin_offset
                 result_json['entities']['mention']['sentiment']['magnitude'] = mention.sentiment.magnitude
                 result_json['entities']['mention']['sentiment']['score'] = mention.sentiment.score
-                result_json['entities']['mention']['type'] = mention_type.mention_entity(mention.type)
+                result_json['entities']['mention']['type'] = mention.type
             result_json['entities']['sentiment']['score'] = entity.sentiment.score
             result_json['entities']['sentiment']['magnitude'] = entity.sentiment.magnitude
             all_entities.append(result_json)
@@ -126,8 +141,5 @@ class ReviewsResource(Resource):
         
 
         # analysis = jsonpickle.encode(str(result_json))
-        print(result)
-
-        print('\nEnum Type: ',enum.return_entity(0))
 
         return all_entities
