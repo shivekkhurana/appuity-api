@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse
 import requests
 
 from models import App
-from .service import getApp
+from .service import crawlAndSave
 
 # List resource
 class AppsResource(Resource):
@@ -20,15 +20,21 @@ class AppResource(Resource):
         if (app_found):
             return jsonify(app_found.serialize)
 
-        # fetch html from play store
-        play_store_html = requests.get('https://play.google.com/store/apps/details?id={}'.format(play_store_id))
-        if (play_store_html.status_code != 200):
+        try:
+            # fetch html from play store
+            play_store_html = requests.get('https://play.google.com/store/apps/details?id={}'.format(play_store_id))
+            if (play_store_html.status_code != 200):
+                return {
+                    'message': 'No App found. Please Check ID again',
+                    'status': 404
+                }
+        except requests.exceptions.ConnectionError:
             return {
-                'msg': 'App not found',
-                'status': 404
+                    'message':'Could not fulfill request. Try after some time',
+                    'status' : 500
             }
 
-        app_insert = getApp(play_store_html.text,play_store_id)
+        app_insert = crawlAndSave(play_store_html.text,play_store_id)
 
         if (app_insert):
             app = App.where('play_store_id','=',play_store_id).first()
