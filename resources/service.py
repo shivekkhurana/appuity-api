@@ -18,25 +18,28 @@ def crawlAndSave(html_text,play_store_id):
 
     db = getDb()
     with db.transaction():
-        app.save()
-        saved_app_id = app.id
-        for review_detail in review_details:
-            author = Author()
-            author.name = review_detail.find('span',{"class":"author-name"}).text.strip()
-            author.avatar_url = review_detail.find('span',{"class":"responsive-img-hdpi"}).find('span')['style'][21:-1]
-            author.save()
-            saved_author_id = author.id
-            review = Review()
-            review.author_id = saved_author_id
-            text = review_detail.find('div',{"class":"review-body"}).text.strip()[:-13]
-            review.review_text = text
-            review.app_id = saved_app_id
-            review.analysis = jsonpickle.encode(getReviewAnalysisPractice(text))
-            review.date = review_detail.find('span',{"class":"review-date"}).text
-            review.rating = review_detail.find('div',{"class":"tiny-star star-rating-non-editable-container"})['aria-label'][6:7]
-            review.save()
-    return True
-    # return False
+        try:
+            app.save()
+            saved_app_id = app.id
+            for review_detail in review_details:
+                author = Author()
+                author.name = review_detail.find('span',{"class":"author-name"}).text.strip()
+                author.avatar_url = review_detail.find('span',{"class":"responsive-img-hdpi"}).find('span')['style'][21:-1]
+                author.save()
+                saved_author_id = author.id
+                review = Review()
+                review.author_id = saved_author_id
+                text = review_detail.find('div',{"class":"review-body"}).text.strip()[:-13]
+                review.review_text = text
+                review.app_id = saved_app_id
+                review.analysis = jsonpickle.encode(getReviewAnalysisPractice(text))
+                review.date = review_detail.find('span',{"class":"review-date"}).text
+                review.rating = review_detail.find('div',{"class":"tiny-star star-rating-non-editable-container"})['aria-label'][6:7]
+                review.save()
+            return True
+        except:
+        	print("Something went wrong")
+        	return False
 
 
     # authors = []
