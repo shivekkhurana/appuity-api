@@ -27,14 +27,16 @@ class ReviewsResource(Resource):
             'review_analysis':review.analysis,
         }
 
+    def getAllReviews(self,app):
+        db_app_id = app.id
+        db = getDb()
+        return db.table('reviews').join('authors', 'authors.id', '=', 'reviews.author_id').where('app_id','=',db_app_id).get()
+
     def get(self, play_store_id):
 
         exists = App.where('play_store_id', '=', play_store_id).first()
         if (exists):
-            exists_id  = exists.id
-            print('App id : ',exists_id)
-            db = getDb()
-            reviews = db.table('reviews').join('authors', 'authors.id', '=', 'reviews.author_id').where('app_id','=',exists_id).get()
+            reviews = self.getAllReviews(exists)
             # reviews = Review.where('app_id','=',exists_id).get()
             return [self.serialize(review) for review in reviews]
 
@@ -56,10 +58,8 @@ class ReviewsResource(Resource):
         app_insert = crawlAndSave(play_store_html.text,play_store_id)
 
         if (app_insert):
-            exists = App.where('play_store_id', '=', play_store_id).first()
-            exists_id  = exists.id
-            db = getDb()
-            reviews = db.table('reviews').join('authors', 'authors.id', '=', 'reviews.author_id').where('app_id','=',exists_id).get()
+            inserted_app = App.where('play_store_id', '=', play_store_id).first()
+            reviews = self.getAllReviews(inserted_app)
             return [self.serialize(review) for review in reviews]
         else:
             return {'message':'Some error occured while completeing request','status':500}
