@@ -1,7 +1,7 @@
 from orator.migrations import Migration
 
 
-class RemoveSizeClomunFromApp(Migration):
+class RemoveSizeColumnFromApp(Migration):
 
     def up(self):
         with self.schema.table('apps') as table:

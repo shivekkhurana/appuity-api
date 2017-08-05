@@ -12,3 +12,9 @@ class Review(Base):
     @belongs_to
     def app(self):
         return App
+
+    def with_author(self):
+    	return self.with_('author')
+
+    def with_app(self):
+    	return self.with_('app')

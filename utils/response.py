@@ -20,3 +20,10 @@ class Response:
             'msg': msg,
             'collection': [m.to_dict() for m in collection.all()] 
         }
+
+    @staticmethod
+    def custom(msg, data):
+        return {
+            'msg': msg,
+            'data': data
+        }

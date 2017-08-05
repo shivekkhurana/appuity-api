@@ -1,7 +1,7 @@
 from orator.migrations import Migration
 
 
-class AddCloumnsToReview(Migration):
+class AddColumnsToReview(Migration):
 
     def up(self):
         with self.schema.table('reviews') as table:
