@@ -11,8 +11,6 @@ from models.base import getDb
 from models import App,Review
 from .service import crawlAndSave
 
-
-
 class ReviewsResource(Resource):
 
     def serialize(self,review):

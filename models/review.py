@@ -12,14 +12,3 @@ class Review(Base):
     @belongs_to
     def app(self):
         return App
-
-    @property
-    def serialize(self):
-    	return {
-    		'app_id':self.app_id,
-    		'author_id':self.author_id,
-    		'rating':self.rating,
-    		'review_text':self.review_text,
-    		'date':self.date,
-    		'review_analysis':self.analysis,
-    	}
