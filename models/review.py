@@ -21,8 +21,8 @@ class Review(Base):
         from .app import App
         return App
 
-    def fetch_analysis_and_save(reviews):
-        async def main():
+    def fetch_analysis_and_save(self, reviews):
+        async def process_reviews():
             with concurrent.futures.ThreadPoolExecutor(max_workers=24) as executor:
                 loop = asyncio.get_event_loop()
                 sentiment_futures = [loop.run_in_executor(
@@ -55,14 +55,14 @@ class Review(Base):
                 responses = [response for response in await asyncio.gather(*all_futures)]
                 analysed_reviews = [dict(r, **{
                     'analysis': json.dumps({
-                        'sentiment': responses[i] 
-                        'entity': response[len(reviews) + i]
+                        'sentiment': json.loads(responses[i].text),
+                        'entity': json.loads(responses[len(reviews) + i].text)
                     })
                 }) for i, r in enumerate(reviews)]
                 self.bulk_insert(analysed_reviews)
 
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(main())
+        loop = asyncio.get_event_loop_policy().new_event_loop()
+        loop.run_until_complete(process_reviews())
 
     @scope
     def with_author(self, query):

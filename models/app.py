@@ -74,8 +74,7 @@ class App(Base):
             'author_id': author_ids[i]
         }) for i, review in enumerate(reviews)]
 
-
-        Review.fetch_analysis_and_save(reviews_with_relations)
+        Review().fetch_analysis_and_save(reviews_with_relations)
         return self
 
     @scope

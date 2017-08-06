@@ -9,4 +9,4 @@ databases = {
     }
 }
 
-google_api_key = 'something'
+google_api_key = 'ABKza.....TsN1K'
