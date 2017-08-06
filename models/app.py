@@ -48,6 +48,9 @@ class App(Base):
         return self
 
     def parse_and_save_reviews(self):
+        from .author import Author
+        from .review import Review
+        
         soup = BeautifulSoup(self.play_store_html, 'html.parser')
         review_details  = soup.findAll('div', {"class": "single-review"})
 
@@ -68,12 +71,11 @@ class App(Base):
         reviews = [p['review'] for p in parsed]
         reviews_with_relations = [dict(review, **{
             'app_id': self.id,
-            'author_id': author_ids[i],
-            'analysis': json.dumps({})
+            'author_id': author_ids[i]
         }) for i, review in enumerate(reviews)]
 
 
-        Review().bulk_insert(reviews_with_relations)
+        Review.fetch_analysis_and_save(reviews_with_relations)
         return self
 
     @scope

@@ -1,11 +1,13 @@
 from flask_restful import Resource, reqparse
 import requests
+import time
 
 from models import App, Review
 from utils import Response
 
 class ReviewsResource(Resource):
     def get(self, play_store_id):
+        start_time = time.time()
         app = App.for_play_store_id(play_store_id).first()
         if not app:
             try:
@@ -23,10 +25,10 @@ class ReviewsResource(Resource):
 
         args = reqparse.RequestParser().add_argument('page_num', type=int, required=False).parse_args()
         return Response.pagination(
-            'Reviews Delivered',
+            'Reviews Delivered in {} seconds'.format(round(time.time() - start_time, 2)),
             Review.for_play_store_id(play_store_id).with_author(),
             args.get('page_num') or 1,
-            3
+            8
         )
 
 
