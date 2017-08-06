@@ -2,8 +2,6 @@ import json
 from bs4 import BeautifulSoup
 from orator.orm import has_many, scope
 
-from .author import Author
-from .review import Review
 from .base import Base
 
 class App(Base):
@@ -14,10 +12,9 @@ class App(Base):
         'play_store_html'
     ]
 
-    __guarded__ = ['id', 'play_store_html']
-
     @has_many
     def reviews(self):
+        from .review import Review
         return Review
 
     def serialize(self):

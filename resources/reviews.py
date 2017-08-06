@@ -1,4 +1,4 @@
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 import requests
 
 from models import App, Review
@@ -18,15 +18,16 @@ class ReviewsResource(Resource):
             app = App()
             app.parse_html_and_save(res.text, play_store_id)
 
-        app.parse_and_save_reviews()
+        if not app.reviews.count() > 0:
+            app.parse_and_save_reviews()
 
-        # refetch to refresh reviews
-        app = App.for_play_store_id(play_store_id).first()
-        if app.reviews.count() > 0:
-            return Response.custom('App reviews with sentiments delivered', {
-                'app': app.serialize(),
-                'reviews': [r.serialize() for r in app.reviews.all()]
-            })
+        args = reqparse.RequestParser().add_argument('page_num', type=int, required=False).parse_args()
+        return Response.pagination(
+            'Reviews Delivered',
+            Review.for_play_store_id(play_store_id).with_author(),
+            args.get('page_num') or 1,
+            3
+        )
 
 
         

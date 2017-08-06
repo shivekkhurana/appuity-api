@@ -1,4 +1,5 @@
 from orator.orm import has_many
+
 from .base import Base
 
 class Author(Base):
@@ -7,4 +8,5 @@ class Author(Base):
 
 	@has_many
 	def reviews(self):
+		from .review import Review
 		return Review

@@ -22,8 +22,13 @@ class Response:
         }
 
     @staticmethod
-    def custom(msg, data):
+    def pagination(msg, query, page_num, per_page=10):
+        total = query.count()
         return {
             'msg': msg,
-            'data': data
+            'total': total,
+            'current_page': page_num,
+            'per_page': per_page,
+            'last_page': int(total//per_page),
+            'collection': query.paginate(per_page, page_num).serialize()
         }
