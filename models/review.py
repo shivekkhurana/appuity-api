@@ -27,28 +27,28 @@ class Review(Base):
                 loop = asyncio.get_event_loop()
                 sentiment_futures = [loop.run_in_executor(
                     executor, 
-                    requests.post, 
+                    lambda: requests.post(
                     'https://language.googleapis.com/v1/documents:analyzeSentiment?key={}'.format(google_api_key),
-                    {
+                    json={
                         "encodingType": "UTF8",
                         "document": {
                             "type": "PLAIN_TEXT",
                             "content": r['review_text']
                         }
-                    }
+                    })
                 ) for r in reviews]
                 
                 entity_futures = [loop.run_in_executor(
                     executor, 
-                    requests.post, 
+                    lambda: requests.post(
                     'https://language.googleapis.com/v1/documents:analyzeEntities?key={}'.format(google_api_key),
-                    {
+                    json={
                         "encodingType": "UTF8",
                         "document": {
                             "type": "PLAIN_TEXT",
                             "content": r['review_text']
                         }
-                    }
+                    })
                 ) for r in reviews]
 
                 all_futures = sentiment_futures + entity_futures

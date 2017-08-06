@@ -1,4 +1,4 @@
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 import requests
 from utils import Response
 
@@ -7,7 +7,8 @@ from models import App
 # List resource
 class AppsResource(Resource):
     def get(self):
-        return Response.collection('All apps', App.all())
+        args = reqparse.RequestParser().add_argument('page_num', type=int, required=False).parse_args()
+        return Response.pagination('Apps delivered', App, args.get('page_num') or 1, 8)
 
 
 # Instance resource
