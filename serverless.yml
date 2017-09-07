@@ -1,0 +1,19 @@
+service: appuity
+
+provider:
+  name: openwhisk
+  runtime: python:3
+
+plugins:
+  - serverless-openwhisk
+  - serverless-wsgi
+
+functions:
+  api:
+    handler: api.openwhisk_handler
+    events:
+      - http: ANY /
+
+package:
+  exclude:
+    - node_modules/**

@@ -1,5 +1,12 @@
+import os, sys
+requirements_path = '.requirements'
+import sys
+if not requirements_path in sys.path:
+    sys.path.append(requirements_path)
+
 from flask import Flask
 from flask_restful import Resource, Api
+from utils import ow_invoke
 
 from resources import App, Apps, Index, Reviews, Authors
 
@@ -13,6 +20,9 @@ api.add_resource(App, '/apps/<play_store_id>')
 api.add_resource(Reviews, '/apps/<play_store_id>/reviews')
 # api.add_resource(Reviews, '/apps/<play_store_id>/authors')
 # api.add_resource(User, '/users')
+
+def openwhisk_handler(args):
+	return ow_invoke(app, args)
 
 if __name__ == '__main__':
     app.run(debug=True)
