@@ -1,18 +1,14 @@
-import os, sys
-requirements_path = '.requirements'
-import sys
-if not requirements_path in sys.path:
-    sys.path.append(requirements_path)
-
 from flask import Flask
 from flask_restful import Resource, Api
+from flask_cors import CORS
 from utils import ow_invoke
 
 from resources import App, Apps, Index, Reviews, Authors
 
 app = Flask(__name__)
-api = Api(app)
+CORS(app)
 
+api = Api(app)
 api.add_resource(Index, '/')
 api.add_resource(Authors, '/authors')
 api.add_resource(Apps, '/apps')

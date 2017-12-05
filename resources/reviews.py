@@ -28,7 +28,7 @@ class ReviewsResource(Resource):
             'Reviews Delivered in {} seconds'.format(round(time.time() - start_time, 2)),
             Review.for_play_store_id(play_store_id).with_author(),
             args.get('page_num') or 1,
-            8
+            40
         )
 
 

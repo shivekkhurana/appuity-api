@@ -23,7 +23,7 @@ class App(Base):
 
     def parse_html_and_save(self, html, play_store_id):
         soup = BeautifulSoup(html, 'html.parser')
-        meta_info = soup.findAll('div',{'class': 'meta-info'})
+        meta_info = soup.findAll('div', {'class': 'meta-info'})
 
         version = ''
         if 'Current Version' in meta_info[2].text:
