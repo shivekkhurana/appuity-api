@@ -26,9 +26,13 @@ class App(Base):
         meta_info = soup.findAll('div', {'class': 'meta-info'})
 
         version = ''
-        if 'Current Version' in meta_info[2].text:
-            version += meta_info[2].text.strip()[17:]
-        else:
+        try:
+            if 'Current Version' in meta_info[2].text:
+                version += meta_info[2].text.strip()[17:]
+            else:
+                version += 'Not Mentioned'
+        except Exception:
+            print("Can't parse version")
             version += 'Not Mentioned'
         
         self.name = soup.select('.id-app-title')[0].text
