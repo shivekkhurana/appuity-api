@@ -2,13 +2,16 @@ import requests
 from invoke import task
 import concurrent.futures
 import time
+import os
+import urllib.parse
+urllib.parse.uses_netloc.append("postgres")
 import asyncio
 
 from config import google_api_key
 
 @task
 def dev(ctx):
-    ctx.run("python server.py")
+    ctx.run("python app.py")
 
 @task
 def populate_apps_table(ctx):
